@@ -18,6 +18,7 @@ git clone https://github.com/твой_логин/task-manager.git
 cd task-manager
 docker compose up -d --build
 Открыть: http://localhost:8080
+```
 
 API
 GET /api/tasks — список задач
@@ -28,4 +29,5 @@ PUT /api/tasks/:id — переключить статус
 
 DELETE /api/tasks/:id — удалить задачу
 
-<img width="1000" height="500" alt="Screenshot_1" src="https://github.com/user-attachments/assets/7078ae8b-9ceb-4d05-93c6-193b05ebb711" />
+## Скриншот
+<img width="1000" height="500" alt="Screenshot_1" src="https://github.com/user-attachments/assets/7bf47403-f5bd-4354-9b61-e12061f9845e" />
