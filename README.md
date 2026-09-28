@@ -28,3 +28,4 @@ PUT /api/tasks/:id — переключить статус
 
 DELETE /api/tasks/:id — удалить задачу
 
+<img width="1000" height="500" alt="Screenshot_1" src="https://github.com/user-attachments/assets/9fd4c499-2a67-4161-9d97-3024965ac206" />
