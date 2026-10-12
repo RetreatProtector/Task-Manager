@@ -45,7 +45,7 @@ jobs:
   # ========== JOB 2: Деплой на VM ==========
   deploy:
     needs: build-and-push  # ждём успеха первого job
-    runs-on: runs-on: self-hosted
+    runs-on: self-hosted
   steps:
     - name: Deploy
       run: |
