@@ -45,7 +45,14 @@ jobs:
   # ========== JOB 2: Деплой на VM ==========
   deploy:
     needs: build-and-push  # ждём успеха первого job
-    runs-on: ubuntu-latest
+    runs-on: runs-on: self-hosted
+  steps:
+    - name: Deploy
+      run: |
+        cd ~/project
+        docker compose pull backend
+        docker compose up -d
+        docker image prune -f
 
     steps:
       # 1. Подключаемся по SSH и обновляем контейнеры
