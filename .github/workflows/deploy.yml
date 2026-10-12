@@ -1,0 +1,63 @@
+name: Build and Deploy
+
+# Триггер: запускается при пуше в main
+on:
+  push:
+    branches:
+      - main
+
+# Переменные окружения
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/backend
+
+jobs:
+  # ========== JOB 1: Сборка и публикация образа ==========
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # 1. Клонируем репозиторий
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 2. Логинимся в GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_TOKEN }}
+
+      # 3. Собираем и пушим Docker-образ
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./backend
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+
+  # ========== JOB 2: Деплой на VM ==========
+  deploy:
+    needs: build-and-push  # ждём успеха первого job
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Подключаемся по SSH и обновляем контейнеры
+      - name: Deploy to VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd ~/project
+            echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker compose pull backend
+            docker compose up -d
+            docker image prune -f

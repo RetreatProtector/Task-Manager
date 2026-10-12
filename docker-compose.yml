@@ -24,7 +24,7 @@ services:
 
   # 2. Backend (Node.js + Express)
   backend:
-    build: ./backend
+    image: ghcr.io/RetreatProtector/task-manager/backend:latest
     container_name: task-backend
     environment:
       DB_HOST: db
