@@ -9,7 +9,7 @@ on:
 # Переменные окружения
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}/backend
+  IMAGE_NAME: retreatprotector/task-manager/backend
 
 jobs:
   # ========== JOB 1: Сборка и публикация образа ==========
