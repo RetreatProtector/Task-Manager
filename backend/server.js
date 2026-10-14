@@ -1,6 +1,17 @@
 const express = require('express');
 const cors = require('cors');
 const pool = require('./db');
+const client = require('prom-client');
+
+const register = new client.Registry();
+client.collectDefaultMetrics({ register });
+
+const httpRequestsTotal = new client.Counter({
+    name: 'http_requests_total',
+    help: 'Total number of HTTP requests',
+    labelNames: ['method', 'path', 'status'],
+});
+register.registerMetric(httpRequestsTotal);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -8,9 +19,27 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-// Health check — важно для DevOps!
+// Middleware для счётчика
+app.use((req, res, next) => {
+    res.on('finish', () => {
+        httpRequestsTotal.inc({
+            method: req.method,
+            path: req.path,
+            status: res.statusCode,
+        });
+    });
+    next();
+});
+
+// Health check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Метрики для Prometheus
+app.get('/metrics', async (req, res) => {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
 });
 
 // Получить все задачи
