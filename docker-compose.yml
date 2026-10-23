@@ -76,7 +76,12 @@ services:
       GF_SECURITY_ADMIN_PASSWORD: admin
       GF_USERS_ALLOW_SIGN_UP: "false"
     volumes:
+      # Постоянное хранилище для настроек Grafana
       - grafana-data:/var/lib/grafana
+      # Прокидываем наши конфиги (провайдеры)
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      # Прокидываем сами JSON-файлы с дашбордами
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
     ports:
       - "3001:3000"
     depends_on:
@@ -84,7 +89,6 @@ services:
     networks:
       - task-net
     restart: unless-stopped
-
   # Node Exporter — метрики VM
   node-exporter:
     image: prom/node-exporter:latest
